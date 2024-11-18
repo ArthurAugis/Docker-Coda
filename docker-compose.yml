@@ -1,0 +1,41 @@
+services:
+  php-apache:
+    build: './build/php'
+    ports:
+      - "80:80"
+    volumes:
+      - ./app:/var/www/html
+    networks:
+      - app-network
+    depends_on:
+      - mysql
+
+  mysql:
+    build: './build/mysql'
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "p@ssword"
+      MYSQL_DATABASE: "auar3589_pokedexsio"
+    volumes:
+      - dbData:/var/lib/mysql
+      - ./build/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./build/mysql/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+    depends_on:
+      - mysql
+
+volumes:
+  app:
+  dbData:
+
+networks:
+  app-network:
